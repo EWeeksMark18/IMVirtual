@@ -1,8 +1,7 @@
 # Required libraries (must be installed globally)
 
 ## For Linux:
-libglfw3
-libglew-dev
+You must install libglfw3-dev, libglfw3, and libglew-dev.
 
 ## For Windows
 I have yet to personally get vcpkg working, but theoretically one could use that and then run CMake.
