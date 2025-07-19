@@ -5,10 +5,10 @@
 
 
 /*
-IMLCORE
+IMVirtual
 
 
-Interpretive Machine Language Core
+Interpretive Machine Virtual
 
 - Fictional/Virtual CPU
 - Pixel graphics
@@ -25,22 +25,22 @@ Interpretive Machine Language Core
 
 */
 
-struct IMLWindowData 
+struct IMXWindowData 
 {
     int width, height;
     const char* title;
 };
-static IMLWindowData imlWindowData = {400, 400, "IMLEmulator"};
+static IMXWindowData imxWindowData = {400, 400, "IMLEmulator"};
 
 int main()
 {
-    std::cout << "Hello IMLCORE!\n";
+    std::cout << "Hello IMVirtual!\n";
 
 
     if (!glfwInit())
         std::cerr << "Could not initialize GLFW\n";
 
-    GLFWwindow* window = glfwCreateWindow(imlWindowData.width, imlWindowData.height, imlWindowData.title, NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(imxWindowData.width, imxWindowData.height, imxWindowData.title, NULL, NULL);
 
     glfwMakeContextCurrent(window);
 
