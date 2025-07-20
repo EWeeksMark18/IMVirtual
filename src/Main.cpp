@@ -7,6 +7,8 @@
 #include "include/imgui/imgui_impl_opengl3.h"
 #include "include/imgui/imgui_impl_glfw.h"
 
+#include <vector>
+
 /*
 IMVirtual
 
@@ -34,6 +36,15 @@ struct IMXWindowData
     const char* title;
 };
 static IMXWindowData imxWindowData = {400, 400, "IMLEmulator"};
+
+struct IMXEditorData
+{
+    char userCodeLineBuffer[512];
+    std::vector<std::string> codeLines;
+
+    bool bAddLineButtonPressed;
+};
+static IMXEditorData imxEditorData;
 
 int main()
 {
@@ -63,7 +74,17 @@ int main()
         ImGui::NewFrame();
 
         ImGui::Begin("Editor");
-        ImGui::Text("Hello.");
+        
+        ImGui::InputText("##", imxEditorData.userCodeLineBuffer, sizeof(imxEditorData.userCodeLineBuffer));
+        ImGui::Text("%s", imxEditorData.userCodeLineBuffer);
+
+        imxEditorData.bAddLineButtonPressed = ImGui::Button("Add line");
+        if (imxEditorData.bAddLineButtonPressed)
+            imxEditorData.codeLines.emplace_back(std::string(imxEditorData.userCodeLineBuffer));
+
+        for (std::string& codeLine : imxEditorData.codeLines)
+            ImGui::Text("%s", codeLine.c_str());
+
         ImGui::End();
 
         ImGui::EndFrame();
