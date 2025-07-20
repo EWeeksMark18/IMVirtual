@@ -6,7 +6,11 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 
-file(GLOB SOURCES "src/*.cpp")
-add_executable(IMVCORE ${SOURCES})
+file(GLOB IMV_SOURCES "src/*.cpp")
+file(GLOB IMGUI_SOURCES "include/imgui/*.cpp")
+
+include_directories(IMVCORE ./)
+
+add_executable(IMVCORE ${IMV_SOURCES} ${IMGUI_SOURCES})
 
 target_link_libraries(IMVCORE OpenGL::OpenGL glfw GLEW::GLEW)
