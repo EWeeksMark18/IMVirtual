@@ -16,6 +16,8 @@ public:
     void Run();
 
     void LoadCommands(std::vector<uint8_t> commands);
+
+    std::array<uint8_t, IMVCPU_MEMORY_MAX> GetMemory();
 private:
     std::array<uint8_t, IMVCPU_MEMORY_MAX> m_Memory; 
     std::vector<uint8_t> m_CommandStack;
