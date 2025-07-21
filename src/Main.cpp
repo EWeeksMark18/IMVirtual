@@ -6,8 +6,15 @@
 #include "include/imgui/imgui.h"
 #include "include/imgui/imgui_impl_opengl3.h"
 #include "include/imgui/imgui_impl_glfw.h"
+#include "include/VirtualCPU.hpp"
 
 #include <vector>
+#include <array>
+#include <thread>
+#include <cstdint>
+#include <cstring>
+#include <sstream>
+#include <iomanip>
 
 /*
 IMVirtual
@@ -35,16 +42,80 @@ struct IMXWindowData
     int width, height;
     const char* title;
 };
-static IMXWindowData imxWindowData = {400, 400, "IMLEmulator"};
+static IMXWindowData imxWindowData = {800, 400, "IMLEmulator"};
 
-struct IMXEditorData
+struct IMXUIEditorData
 {
     char userCodeLineBuffer[512];
     std::vector<std::string> codeLines;
 
     bool bAddLineButtonPressed;
 };
-static IMXEditorData imxEditorData;
+static IMXUIEditorData imxEditorData;
+
+struct IMXUIMemoryViewerData
+{
+    std::string memoryText;
+};
+static IMXUIMemoryViewerData imxuiMemoryViewerData;
+
+struct IMVCPUMemorySegment
+{
+    uint16_t start;
+    uint16_t end;
+};
+
+struct IMVCPUMemoryLayout
+{
+    IMVCPUMemorySegment codeSegment;
+    IMVCPUMemorySegment dataSegment;
+    IMVCPUMemorySegment heapSegment;
+    IMVCPUMemorySegment stackSegment;
+};
+
+
+
+void IMXDisplayCodeEditor()
+{
+    ImGui::Begin("Editor");
+
+    ImGui::InputText("##", imxEditorData.userCodeLineBuffer, sizeof(imxEditorData.userCodeLineBuffer));
+    ImGui::Text("%s", imxEditorData.userCodeLineBuffer);
+
+    imxEditorData.bAddLineButtonPressed = ImGui::Button("Add line");
+    if (imxEditorData.bAddLineButtonPressed)
+        imxEditorData.codeLines.emplace_back(std::string(imxEditorData.userCodeLineBuffer));
+
+    for (std::string& codeLine : imxEditorData.codeLines)
+        ImGui::Text("%s", codeLine.c_str());
+
+    ImGui::End();
+}
+
+void IMXDisplayVCPUMemory()
+{
+    ImGui::Begin("Memory");
+
+    int rowIndex = 0;
+    const int rowLength = 32;
+    for (int i = 0; i < 512; i++)
+    {
+        std::stringstream ss;
+        ss << std::hex << std::setw(2) << std::setfill('0') << 0x00;
+        imxuiMemoryViewerData.memoryText.append(ss.str());
+        rowIndex++;
+        if (rowIndex > rowLength)
+        {
+            rowIndex = 0;
+            imxuiMemoryViewerData.memoryText.append("\n");
+        }
+    }
+
+    ImGui::Text("%s", imxuiMemoryViewerData.memoryText.c_str());
+    imxuiMemoryViewerData.memoryText.clear();
+
+    ImGui::End();
+}
 
 int main()
 {
@@ -65,6 +136,11 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init();
 
+    IMVVirtualCPU vCPU;
+    vCPU.LoadCommands({0x88, 0xFF});
+    vCPU.Init();
+
+
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT);
@@ -73,19 +149,10 @@ int main()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Editor");
-        
-        ImGui::InputText("##", imxEditorData.userCodeLineBuffer, sizeof(imxEditorData.userCodeLineBuffer));
-        ImGui::Text("%s", imxEditorData.userCodeLineBuffer);
+        vCPU.Run();
 
-        imxEditorData.bAddLineButtonPressed = ImGui::Button("Add line");
-        if (imxEditorData.bAddLineButtonPressed)
-            imxEditorData.codeLines.emplace_back(std::string(imxEditorData.userCodeLineBuffer));
-
-        for (std::string& codeLine : imxEditorData.codeLines)
-            ImGui::Text("%s", codeLine.c_str());
-
-        ImGui::End();
+        IMXDisplayCodeEditor();
+        IMXDisplayVCPUMemory();
 
         ImGui::EndFrame();
 
@@ -96,6 +163,9 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+
+    vCPU.Reset();
 
 
     ImGui_ImplOpenGL3_Shutdown();
