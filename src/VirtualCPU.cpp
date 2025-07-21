@@ -26,6 +26,11 @@ void IMVVirtualCPU::LoadCommands(std::vector<uint8_t> commands)
         m_CommandStack.emplace_back(command);
 }
 
+std::array<uint8_t, IMVCPU_MEMORY_MAX> IMVVirtualCPU::GetMemory()
+{
+    return m_Memory;
+}
+
 void IMVVirtualCPU::LoadCommandStackIntoMemory()
 {
     uint16_t memoryIndex;

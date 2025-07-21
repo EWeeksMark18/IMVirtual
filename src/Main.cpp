@@ -92,7 +92,7 @@ void IMXDisplayCodeEditor()
     ImGui::End();
 }
 
-void IMXDisplayVCPUMemory()
+void IMXDisplayVCPUMemory(IMVVirtualCPU& _cpu)
 {
     ImGui::Begin("Memory");
 
@@ -101,7 +101,7 @@ void IMXDisplayVCPUMemory()
     for (int i = 0; i < 512; i++)
     {
         std::stringstream ss;
-        ss << std::hex << std::setw(2) << std::setfill('0') << 0x00;
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int)_cpu.GetMemory()[i];
         imxuiMemoryViewerData.memoryText.append(ss.str());
         rowIndex++;
         if (rowIndex > rowLength)
@@ -137,7 +137,10 @@ int main()
     ImGui_ImplOpenGL3_Init();
 
     IMVVirtualCPU vCPU;
-    vCPU.LoadCommands({0x88, 0xFF});
+    vCPU.LoadCommands({
+        0x88, 0xFF,
+        0x99, 0x34,
+    });
     vCPU.Init();
 
 
@@ -152,7 +155,7 @@ int main()
         vCPU.Run();
 
         IMXDisplayCodeEditor();
-        IMXDisplayVCPUMemory();
+        IMXDisplayVCPUMemory(vCPU);
 
         ImGui::EndFrame();
 
