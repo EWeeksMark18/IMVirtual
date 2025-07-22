@@ -6,14 +6,6 @@
 #include "include/GUI.hpp"
 #include "include/VirtualCPU.hpp"
 
-#include <vector>
-#include <array>
-#include <thread>
-#include <cstdint>
-#include <cstring>
-#include <sstream>
-#include <iomanip>
-
 /*
 IMVirtual
 
