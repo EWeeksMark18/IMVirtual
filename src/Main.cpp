@@ -50,6 +50,8 @@ struct IMXUIEditorData
     std::vector<std::string> codeLines;
 
     bool bAddLineButtonPressed;
+    bool bRunCPUButtonPressed;
+    bool bClearMemoryButtonPressed;
 };
 static IMXUIEditorData imxEditorData;
 
@@ -58,21 +60,6 @@ struct IMXUIMemoryViewerData
     std::string memoryText;
 };
 static IMXUIMemoryViewerData imxuiMemoryViewerData;
-
-struct IMVCPUMemorySegment
-{
-    uint16_t start;
-    uint16_t end;
-};
-
-struct IMVCPUMemoryLayout
-{
-    IMVCPUMemorySegment codeSegment;
-    IMVCPUMemorySegment dataSegment;
-    IMVCPUMemorySegment heapSegment;
-    IMVCPUMemorySegment stackSegment;
-};
-
 
 
 void IMXDisplayCodeEditor()
@@ -114,6 +101,26 @@ void IMXDisplayVCPUMemory(IMVVirtualCPU& _cpu)
     ImGui::Text("%s", imxuiMemoryViewerData.memoryText.c_str());
     imxuiMemoryViewerData.memoryText.clear();
 
+    imxEditorData.bRunCPUButtonPressed = ImGui::Button("Run CPU");
+    if (imxEditorData.bRunCPUButtonPressed)
+    {
+        _cpu.LoadCommands(
+            {
+                VASM_START,
+
+                VASM_LDA, 0x99,
+
+                VASM_END
+            }
+        );
+        _cpu.Run();
+    }
+    imxEditorData.bClearMemoryButtonPressed = ImGui::Button("Clear memory");
+    if (imxEditorData.bClearMemoryButtonPressed)
+    {
+        _cpu.Reset();
+    }
+
     ImGui::End();
 }
 
@@ -130,19 +137,13 @@ int main()
     if (glewInit() != GLEW_OK)
         std::cerr << "Could not initialize GLEW\n";
 
-
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init();
 
     IMVVirtualCPU vCPU;
-    vCPU.LoadCommands({
-        0x88, 0xFF,
-        0x99, 0x34,
-    });
     vCPU.Init();
-
 
     while (!glfwWindowShouldClose(window))
     {
@@ -152,13 +153,10 @@ int main()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
 
-        vCPU.Run();
-
         IMXDisplayCodeEditor();
         IMXDisplayVCPUMemory(vCPU);
 
         ImGui::EndFrame();
-
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -166,10 +164,6 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-
-    vCPU.Reset();
-
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

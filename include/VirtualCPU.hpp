@@ -4,8 +4,23 @@
 #include <cstdint>
 #include <cstring>
 
+#include "Commands.hpp"
+
 #define IMVCPU_MEMORY_MAX 1024
 
+struct IMVCPUMemorySegment
+{
+    uint16_t start;
+    uint16_t end;
+};
+
+struct IMVCPUMemoryLayout
+{
+    IMVCPUMemorySegment codeSegment;
+    IMVCPUMemorySegment dataSegment;
+    IMVCPUMemorySegment heapSegment;
+    IMVCPUMemorySegment stackSegment;
+};
 
 class IMVVirtualCPU
 {
