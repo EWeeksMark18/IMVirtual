@@ -16,8 +16,8 @@ struct IMVCPUMemorySegment
 
 struct IMVCPUMemoryLayout
 {
-    IMVCPUMemorySegment codeSegment;
     IMVCPUMemorySegment dataSegment;
+    IMVCPUMemorySegment codeSegment;
     IMVCPUMemorySegment heapSegment;
     IMVCPUMemorySegment stackSegment;
 };
@@ -29,7 +29,6 @@ public:
     void Reset();
 
     void Run();
-
     void LoadCommands(std::vector<uint8_t> commands);
 
     std::array<uint8_t, IMVCPU_MEMORY_MAX> GetMemory();
@@ -37,8 +36,14 @@ private:
     std::array<uint8_t, IMVCPU_MEMORY_MAX> m_Memory; 
     std::vector<uint8_t> m_CommandStack;
 
+    IMVCPUMemoryLayout m_MemoryLayout;
+
     uint8_t m_RegisterA;
     uint8_t m_RegisterB;
 
+
+    void WriteData(uint16_t address, uint8_t value);
+
     void LoadCommandStackIntoMemory();
+    void ExecuteCode();
 };

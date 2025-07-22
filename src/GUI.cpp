@@ -76,11 +76,13 @@ void IMXGUIManager::DisplayMemoryViewer(IMVVirtualCPU& _cpu)
     imxGUIData.bRunCPUButtonPressed = ImGui::Button("Run CPU");
     if (imxGUIData.bRunCPUButtonPressed)
     {
+        // At some point, I want to read whatever program the user wants from disk.
         _cpu.LoadCommands(
             {
                 VASM_START,
 
-                VASM_LDA, 0x99,
+                VASM_DB, 0xFF,
+                VASM_DB, 0x05,
 
                 VASM_END
             }
