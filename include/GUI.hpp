@@ -16,7 +16,6 @@ struct IMXGUIData
     std::vector<std::string> codeLines;
     std::string memoryText;
 
-
     bool bAddLineButtonPressed;
     bool bRunCPUButtonPressed;
     bool bClearMemoryButtonPressed;
@@ -28,6 +27,9 @@ class IMXGUIManager
 public:
     static void Init(GLFWwindow* window);
     static void Close();
+
+    static void LoadFrame();
+    static void RenderFrame();
 
     static void DisplayCodeEditor();
     static void DisplayMemoryViewer(IMVVirtualCPU& _cpu);

@@ -20,6 +20,20 @@ void IMXGUIManager::Close()
     ImGui::DestroyContext();
 }
 
+void IMXGUIManager::LoadFrame()
+{
+    ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+}
+    
+void IMXGUIManager::RenderFrame()
+{
+    ImGui::EndFrame();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 void IMXGUIManager::DisplayCodeEditor()
 {
     ImGui::Begin("Editor");
