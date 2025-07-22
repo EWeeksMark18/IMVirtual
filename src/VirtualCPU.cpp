@@ -5,7 +5,7 @@ void IMVVirtualCPU::Init()
 {
     Reset();
 
-    // Do some further initialization
+    // Do some further initialization (for the future)
 }
 
 void IMVVirtualCPU::Reset()

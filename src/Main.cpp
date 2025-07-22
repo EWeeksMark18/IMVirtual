@@ -3,9 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "include/imgui/imgui.h"
-#include "include/imgui/imgui_impl_opengl3.h"
-#include "include/imgui/imgui_impl_glfw.h"
+#include "include/GUI.hpp"
 #include "include/VirtualCPU.hpp"
 
 #include <vector>
@@ -44,86 +42,6 @@ struct IMXWindowData
 };
 static IMXWindowData imxWindowData = {800, 400, "IMLEmulator"};
 
-struct IMXUIEditorData
-{
-    char userCodeLineBuffer[512];
-    std::vector<std::string> codeLines;
-
-    bool bAddLineButtonPressed;
-    bool bRunCPUButtonPressed;
-    bool bClearMemoryButtonPressed;
-};
-static IMXUIEditorData imxEditorData;
-
-struct IMXUIMemoryViewerData
-{
-    std::string memoryText;
-};
-static IMXUIMemoryViewerData imxuiMemoryViewerData;
-
-
-void IMXDisplayCodeEditor()
-{
-    ImGui::Begin("Editor");
-
-    ImGui::InputText("##", imxEditorData.userCodeLineBuffer, sizeof(imxEditorData.userCodeLineBuffer));
-    ImGui::Text("%s", imxEditorData.userCodeLineBuffer);
-
-    imxEditorData.bAddLineButtonPressed = ImGui::Button("Add line");
-    if (imxEditorData.bAddLineButtonPressed)
-        imxEditorData.codeLines.emplace_back(std::string(imxEditorData.userCodeLineBuffer));
-
-    for (std::string& codeLine : imxEditorData.codeLines)
-        ImGui::Text("%s", codeLine.c_str());
-
-    ImGui::End();
-}
-
-void IMXDisplayVCPUMemory(IMVVirtualCPU& _cpu)
-{
-    ImGui::Begin("Memory");
-
-    int rowIndex = 0;
-    const int rowLength = 32;
-    for (int i = 0; i < 512; i++)
-    {
-        std::stringstream ss;
-        ss << std::hex << std::setw(2) << std::setfill('0') << (int)_cpu.GetMemory()[i];
-        imxuiMemoryViewerData.memoryText.append(ss.str());
-        rowIndex++;
-        if (rowIndex > rowLength)
-        {
-            rowIndex = 0;
-            imxuiMemoryViewerData.memoryText.append("\n");
-        }
-    }
-
-    ImGui::Text("%s", imxuiMemoryViewerData.memoryText.c_str());
-    imxuiMemoryViewerData.memoryText.clear();
-
-    imxEditorData.bRunCPUButtonPressed = ImGui::Button("Run CPU");
-    if (imxEditorData.bRunCPUButtonPressed)
-    {
-        _cpu.LoadCommands(
-            {
-                VASM_START,
-
-                VASM_LDA, 0x99,
-
-                VASM_END
-            }
-        );
-        _cpu.Run();
-    }
-    imxEditorData.bClearMemoryButtonPressed = ImGui::Button("Clear memory");
-    if (imxEditorData.bClearMemoryButtonPressed)
-    {
-        _cpu.Reset();
-    }
-
-    ImGui::End();
-}
-
 int main()
 {
     std::cout << "Hello IMVirtual!\n";
@@ -137,10 +55,7 @@ int main()
     if (glewInit() != GLEW_OK)
         std::cerr << "Could not initialize GLEW\n";
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
+    IMXGUIManager::Init(window);
 
     IMVVirtualCPU vCPU;
     vCPU.Init();
@@ -153,8 +68,8 @@ int main()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
 
-        IMXDisplayCodeEditor();
-        IMXDisplayVCPUMemory(vCPU);
+        IMXGUIManager::DisplayCodeEditor();
+        IMXGUIManager::DisplayMemoryViewer(vCPU);
 
         ImGui::EndFrame();
 
@@ -165,9 +80,7 @@ int main()
         glfwPollEvents();
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    IMXGUIManager::Close();
 
     glfwDestroyWindow(window);
     glfwTerminate();
