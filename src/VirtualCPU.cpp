@@ -14,8 +14,8 @@ void IMVVirtualCPU::Init()
     // Do not save on disk
     m_MemoryLayout.heapSegment.start =      0x0080;
     m_MemoryLayout.heapSegment.end =        0x0160;
-    m_MemoryLayout.heapSegment.start =      0x0160;
-    m_MemoryLayout.heapSegment.end =        0x0200;
+    m_MemoryLayout.stackSegment.start =      0x0160;
+    m_MemoryLayout.stackSegment.end =        0x0200;
 }
 
 void IMVVirtualCPU::Reset()
@@ -42,6 +42,27 @@ std::array<uint8_t, IMVCPU_MEMORY_MAX> IMVVirtualCPU::GetMemory()
 {
     return m_Memory;
 }
+
+uint8_t IMVVirtualCPU::GetRegisterA()
+{
+    return m_RegisterA;
+}
+
+uint8_t IMVVirtualCPU::GetRegisterB()
+{
+    return m_RegisterB;
+}
+
+void IMVVirtualCPU::WriteRegisterA(uint8_t value)
+{
+    m_RegisterA = value;
+}
+    
+void IMVVirtualCPU::WriteRegisterB(uint8_t value)
+{
+    m_RegisterB = value;
+}
+
 
 void IMVVirtualCPU::WriteData(uint16_t address, uint8_t value)
 {
@@ -80,6 +101,19 @@ void IMVVirtualCPU::ExecuteCode()
         uint8_t commandByte = m_Memory[programCounter];
         switch (commandByte)
         {
+            // Find a way to better encapsulate these. There's a lot of repeated code, and I don't like that.
+            case VASM_LDA:
+            {
+                uint8_t value = m_Memory[programCounter+1];
+                WriteRegisterA(value);
+                programCounter += 1;
+            } break;
+            case VASM_LDB:
+            {
+                uint8_t value = m_Memory[programCounter+1];
+                WriteRegisterB(value);
+                programCounter += 1;
+            } break;
             case VASM_DB:
             {
                 uint8_t value = m_Memory[programCounter+1];
@@ -87,7 +121,7 @@ void IMVVirtualCPU::ExecuteCode()
                 WriteData(dataWriteIndex, value);
 
                 dataWriteIndex++;
-                programCounter += 2;
+                programCounter += 1;
             } break;
         }
     }

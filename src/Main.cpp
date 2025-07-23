@@ -9,7 +9,6 @@
 /*
 IMVirtual
 
-
 Interpretive Machine Virtual
 
 - Fictional/Virtual CPU
@@ -64,7 +63,6 @@ int main()
     }
 
     IMXGUIManager::Close();
-
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

@@ -32,6 +32,8 @@ public:
     void LoadCommands(std::vector<uint8_t> commands);
 
     std::array<uint8_t, IMVCPU_MEMORY_MAX> GetMemory();
+    uint8_t GetRegisterA();
+    uint8_t GetRegisterB();
 private:
     std::array<uint8_t, IMVCPU_MEMORY_MAX> m_Memory; 
     std::vector<uint8_t> m_CommandStack;
@@ -41,6 +43,8 @@ private:
     uint8_t m_RegisterA;
     uint8_t m_RegisterB;
 
+    void WriteRegisterA(uint8_t value);
+    void WriteRegisterB(uint8_t value);
 
     void WriteData(uint16_t address, uint8_t value);
 

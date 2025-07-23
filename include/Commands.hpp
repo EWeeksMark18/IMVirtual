@@ -1,5 +1,3 @@
-
-
 #define VASM_START 0x11
 #define VASM_END 0xFF
 

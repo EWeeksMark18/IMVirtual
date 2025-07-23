@@ -73,6 +73,9 @@ void IMXGUIManager::DisplayMemoryViewer(IMVVirtualCPU& _cpu)
     ImGui::Text("%s", imxGUIData.memoryText.c_str());
     imxGUIData.memoryText.clear();
 
+    ImGui::Text("A: %02X", _cpu.GetRegisterA());
+    ImGui::Text("B: %02X", _cpu.GetRegisterB());
+
     imxGUIData.bRunCPUButtonPressed = ImGui::Button("Run CPU");
     if (imxGUIData.bRunCPUButtonPressed)
     {
@@ -83,6 +86,9 @@ void IMXGUIManager::DisplayMemoryViewer(IMVVirtualCPU& _cpu)
 
                 VASM_DB, 0xFF,
                 VASM_DB, 0x05,
+
+                VASM_LDA, 0x11,
+                VASM_LDB, 0x88,
 
                 VASM_END
             }
