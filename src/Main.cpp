@@ -46,7 +46,7 @@ int main()
 
     IMXGUIManager::Init(window);
 
-    IMVVirtualCPU vCPU;
+    IMVCPU vCPU;
     vCPU.Init();
 
     while (!glfwWindowShouldClose(window))

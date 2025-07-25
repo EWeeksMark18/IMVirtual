@@ -32,6 +32,6 @@ public:
     static void RenderFrame();
 
     static void DisplayCodeEditor();
-    static void DisplayMemoryViewer(IMVVirtualCPU& _cpu);
+    static void DisplayMemoryViewer(IMVCPU& _cpu);
 };
 

@@ -51,7 +51,7 @@ void IMXGUIManager::DisplayCodeEditor()
     ImGui::End();
 }
 
-void IMXGUIManager::DisplayMemoryViewer(IMVVirtualCPU& _cpu)
+void IMXGUIManager::DisplayMemoryViewer(IMVCPU& _cpu)
 {
     ImGui::Begin("Memory");
 
@@ -89,6 +89,8 @@ void IMXGUIManager::DisplayMemoryViewer(IMVVirtualCPU& _cpu)
 
                 VASM_LDA, 0x11,
                 VASM_LDB, 0x88,
+                VASM_STA, 0x01, 0x00,
+                VASM_STB, 0x01, 0x01,
 
                 VASM_END
             }
