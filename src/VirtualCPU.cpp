@@ -25,7 +25,9 @@ void IMVCPU::Reset()
 void IMVCPU::Run()
 {
     LoadCommandStackIntoMemory();
-    ExecuteCode();
+
+    std::thread programThread([this]() { this->ExecuteCode(); });
+    programThread.join();
 }
 
 void IMVCPU::LoadCommands(std::vector<uint8_t> commands)
@@ -128,6 +130,7 @@ void IMVCPU::LoadCommandStackIntoMemory()
 
 void IMVCPU::ExecuteCode()
 {
+    std::lock_guard<std::mutex> lock(m_Mtx);
     // It's bit strange that I'm writing the data at run time rather than on disk. 
     // Though I need to read more about the data segment anyway.
     uint16_t dataWriteIndex = m_ProgramLayout.dataSegment.start;

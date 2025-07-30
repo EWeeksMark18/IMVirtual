@@ -5,6 +5,10 @@
 #include <cstring>
 #include <string>
 
+#include <thread>
+#include <mutex>
+
+
 
 #include "Commands.hpp"
 
@@ -38,6 +42,8 @@ public:
     uint8_t GetRegisterA();
     uint8_t GetRegisterB();
 private:
+    std::mutex m_Mtx;
+
     std::array<uint8_t, IMVCPU_MEMORY_MAX> m_Memory; 
     std::vector<uint8_t> m_CommandStack;
 
