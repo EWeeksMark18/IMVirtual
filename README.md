@@ -32,7 +32,7 @@ Also be sure to integrate with CMake:
 ## On Windows
 I ran into some strange issues with vcpkg and glfw3. So on Windows, run this:
 
-        cmake -S . -B build/ -DCMAKE_TOOLCHAIN_FILE=<your-path-to-vcpkg>/scripts/buildsystems/vcpkg.cmake
+        cmake -S . -B \build\ -DCMAKE_TOOLCHAIN_FILE=<your-path-to-vcpkg>\scripts\buildsystems\vcpkg.cmake
 
 This creates a visual studio solution that you can easily build. On my Windows 11 laptop, the GUI looks a little weird,
 so expect me to work on that in the future.
