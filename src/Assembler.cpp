@@ -9,9 +9,11 @@ void IMXAssembler::LoadTranslationTable()
 {
     translationTable["START"] = VASM_START;
     translationTable["END"] = VASM_END;
-
     translationTable["LDA"] = VASM_LDA;
     translationTable["LDB"] = VASM_LDB;
+    translationTable["STA"] = VASM_STA;
+    translationTable["STB"] = VASM_STB;
+    translationTable["DB"] = VASM_DB;
 }
 
 std::vector<uint8_t> IMXAssembler::Assemble(std::vector<std::string> codeLines)
