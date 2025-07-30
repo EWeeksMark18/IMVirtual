@@ -36,3 +36,8 @@ I ran into some strange issues with vcpkg and glfw3. So on Windows, run this:
 
 This creates a visual studio solution that you can easily build. On my Windows 11 laptop, the GUI looks a little weird,
 so expect me to work on that in the future.
+
+## Locating and running .imx programs. 
+I added an example program called 'basic.imx' in the /vasm_programs/ folder.
+Drag that into your build folder, and type its name/file path into the input box above the 'Run CPU' button.
+You will then see the program load data into the registers and data section (the latter of which still needs some work, mind you). 
