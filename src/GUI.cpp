@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "include/Assembler.hpp"
+
 
 void IMGUIManager::Init(GLFWwindow* window)
 {
@@ -38,15 +40,29 @@ void IMGUIManager::DisplayCodeEditor()
 {
     ImGui::Begin("Editor");
 
-    ImGui::InputText("##", imxGUIData.codeLineTXTBF, sizeof(imxGUIData.codeLineTXTBF));
-    ImGui::Text("%s", imxGUIData.codeLineTXTBF);
+    ImGui::InputText("##", imGUIData.codeLineTXTBF, sizeof(imGUIData.codeLineTXTBF));
+    ImGui::Text("%s", imGUIData.codeLineTXTBF);
 
-    imxGUIData.bAddLineButtonPressed = ImGui::Button("Add line");
-    if (imxGUIData.bAddLineButtonPressed)
-        imxGUIData.codeLines.emplace_back(std::string(imxGUIData.codeLineTXTBF));
+    imGUIData.bAddLineButtonPressed = ImGui::Button("Add line");
+    if (imGUIData.bAddLineButtonPressed)
+        imGUIData.codeLines.emplace_back(std::string(imGUIData.codeLineTXTBF));
 
-    for (std::string& codeLine : imxGUIData.codeLines)
+    for (std::string& codeLine : imGUIData.codeLines)
         ImGui::Text("%s", codeLine.c_str());
+
+    imGUIData.bAssembleCodeButtonPressed = ImGui::Button("Assemble Code");
+    if (imGUIData.bAssembleCodeButtonPressed)
+    {
+        imGUIData.assembledCode = IMXAssembler::Assemble(imGUIData.codeLines);
+    }
+    imGUIData.bWipeCodeButtonPressed = ImGui::Button("Wipe Code");
+    if (imGUIData.bWipeCodeButtonPressed)
+    {
+        imGUIData.assembledCode.clear();
+        imGUIData.codeLines.clear();
+        //std::memset(imGUIData.assembledCode.data(), 0, sizeof(uint8_t) * imGUIData.assembledCode.size());
+        //std::memset(imGUIData.codeLines.data(), 0, sizeof(std::string) * imGUIData.codeLines.size());
+    }
 
     ImGui::End();
 }
@@ -61,38 +77,39 @@ void IMGUIManager::DisplayMemoryViewer(IMVCPU& _cpu)
     {
         std::stringstream ss;
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)_cpu.GetMemory()[i];
-        imxGUIData.memoryDisplayTXTOUT.append(ss.str());
+        imGUIData.memoryDisplayTXTOUT.append(ss.str());
         rowIndex++;
         if (rowIndex > rowLength)
         {
             rowIndex = 0;
-            imxGUIData.memoryDisplayTXTOUT.append("\n");
+            imGUIData.memoryDisplayTXTOUT.append("\n");
         }
     }
 
-    ImGui::Text("%s", imxGUIData.memoryDisplayTXTOUT.c_str());
-    imxGUIData.memoryDisplayTXTOUT.clear();
+    ImGui::Text("%s", imGUIData.memoryDisplayTXTOUT.c_str());
+    imGUIData.memoryDisplayTXTOUT.clear();
 
     ImGui::Text("A: %02X", _cpu.GetRegisterA());
     ImGui::Text("B: %02X", _cpu.GetRegisterB());
 
-    ImGui::InputText("Program name", imxGUIData.programNameTXTBF, sizeof(imxGUIData.programNameTXTBF));
+    ImGui::InputText("Program name", imGUIData.programNameTXTBF, sizeof(imGUIData.programNameTXTBF));
 
-    imxGUIData.bRunCPUButtonPressed = ImGui::Button("Run CPU");
-    if (imxGUIData.bRunCPUButtonPressed)
+    imGUIData.bRunCPUButtonPressed = ImGui::Button("Run CPU");
+    if (imGUIData.bRunCPUButtonPressed)
     {
-        _cpu.ReadProgramFromFileToMemory(std::string(imxGUIData.programNameTXTBF));
+        //_cpu.ReadProgramFromFileToMemory(std::string(imGUIData.programNameTXTBF));
+        _cpu.LoadCommands(imGUIData.assembledCode);
         _cpu.Run();
     }
-    imxGUIData.bClearMemoryButtonPressed = ImGui::Button("Clear memory");
-    if (imxGUIData.bClearMemoryButtonPressed)
+    imGUIData.bClearMemoryButtonPressed = ImGui::Button("Clear memory");
+    if (imGUIData.bClearMemoryButtonPressed)
     {
         _cpu.Reset();
     }
-    imxGUIData.bSaveProgramPressed = ImGui::Button("Save Program");
-    if (imxGUIData.bSaveProgramPressed)
+    imGUIData.bSaveProgramPressed = ImGui::Button("Save Program");
+    if (imGUIData.bSaveProgramPressed)
     {
-        _cpu.SaveCurrentProgramToFile(std::string(imxGUIData.programNameTXTBF));
+        _cpu.SaveCurrentProgramToFile(std::string(imGUIData.programNameTXTBF));
     }
 
     ImGui::End();

@@ -14,17 +14,21 @@ struct IMGUIData
 {
     char codeLineTXTBF[512];
     std::vector<std::string> codeLines;
+    std::vector<uint8_t> assembledCode;
+
+    bool bAddLineButtonPressed;
+    bool bAssembleCodeButtonPressed;
+    bool bWipeCodeButtonPressed;
 
     std::string memoryDisplayTXTOUT;
 
     char programNameTXTBF[128];
 
-    bool bAddLineButtonPressed;
     bool bRunCPUButtonPressed;
     bool bClearMemoryButtonPressed;
     bool bSaveProgramPressed;
 };
-static IMGUIData imxGUIData;
+static IMGUIData imGUIData;
 
 class IMGUIManager
 {
