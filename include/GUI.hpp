@@ -10,21 +10,23 @@
 #include <vector>
 #include <string>
 
-struct IMXGUIData
+struct IMGUIData
 {
-    char userCodeLineBuffer[512];
+    char codeLineTXTBF[512];
     std::vector<std::string> codeLines;
-    std::string memoryText;
 
-    char programNameBuffer[128];
+    std::string memoryDisplayTXTOUT;
+
+    char programNameTXTBF[128];
 
     bool bAddLineButtonPressed;
     bool bRunCPUButtonPressed;
     bool bClearMemoryButtonPressed;
+    bool bSaveProgramPressed;
 };
-static IMXGUIData imxGUIData;
+static IMGUIData imxGUIData;
 
-class IMXGUIManager
+class IMGUIManager
 {
 public:
     static void Init(GLFWwindow* window);

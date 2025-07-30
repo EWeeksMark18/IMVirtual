@@ -5,7 +5,7 @@
 #include <iomanip>
 
 
-void IMXGUIManager::Init(GLFWwindow* window)
+void IMGUIManager::Init(GLFWwindow* window)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -13,37 +13,37 @@ void IMXGUIManager::Init(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init();
 }
 
-void IMXGUIManager::Close()
+void IMGUIManager::Close()
 {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
 
-void IMXGUIManager::LoadFrame()
+void IMGUIManager::LoadFrame()
 {
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 }
     
-void IMXGUIManager::RenderFrame()
+void IMGUIManager::RenderFrame()
 {
     ImGui::EndFrame();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void IMXGUIManager::DisplayCodeEditor()
+void IMGUIManager::DisplayCodeEditor()
 {
     ImGui::Begin("Editor");
 
-    ImGui::InputText("##", imxGUIData.userCodeLineBuffer, sizeof(imxGUIData.userCodeLineBuffer));
-    ImGui::Text("%s", imxGUIData.userCodeLineBuffer);
+    ImGui::InputText("##", imxGUIData.codeLineTXTBF, sizeof(imxGUIData.codeLineTXTBF));
+    ImGui::Text("%s", imxGUIData.codeLineTXTBF);
 
     imxGUIData.bAddLineButtonPressed = ImGui::Button("Add line");
     if (imxGUIData.bAddLineButtonPressed)
-        imxGUIData.codeLines.emplace_back(std::string(imxGUIData.userCodeLineBuffer));
+        imxGUIData.codeLines.emplace_back(std::string(imxGUIData.codeLineTXTBF));
 
     for (std::string& codeLine : imxGUIData.codeLines)
         ImGui::Text("%s", codeLine.c_str());
@@ -51,7 +51,7 @@ void IMXGUIManager::DisplayCodeEditor()
     ImGui::End();
 }
 
-void IMXGUIManager::DisplayMemoryViewer(IMVCPU& _cpu)
+void IMGUIManager::DisplayMemoryViewer(IMVCPU& _cpu)
 {
     ImGui::Begin("Memory");
 
@@ -61,53 +61,38 @@ void IMXGUIManager::DisplayMemoryViewer(IMVCPU& _cpu)
     {
         std::stringstream ss;
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)_cpu.GetMemory()[i];
-        imxGUIData.memoryText.append(ss.str());
+        imxGUIData.memoryDisplayTXTOUT.append(ss.str());
         rowIndex++;
         if (rowIndex > rowLength)
         {
             rowIndex = 0;
-            imxGUIData.memoryText.append("\n");
+            imxGUIData.memoryDisplayTXTOUT.append("\n");
         }
     }
 
-    ImGui::Text("%s", imxGUIData.memoryText.c_str());
-    imxGUIData.memoryText.clear();
+    ImGui::Text("%s", imxGUIData.memoryDisplayTXTOUT.c_str());
+    imxGUIData.memoryDisplayTXTOUT.clear();
 
     ImGui::Text("A: %02X", _cpu.GetRegisterA());
     ImGui::Text("B: %02X", _cpu.GetRegisterB());
 
-    ImGui::InputText("Program name", imxGUIData.programNameBuffer, sizeof(imxGUIData.programNameBuffer));
+    ImGui::InputText("Program name", imxGUIData.programNameTXTBF, sizeof(imxGUIData.programNameTXTBF));
 
     imxGUIData.bRunCPUButtonPressed = ImGui::Button("Run CPU");
     if (imxGUIData.bRunCPUButtonPressed)
     {
-        // At some point, I want to read whatever program the user wants from disk.
-
-        /*
-        _cpu.LoadCommands(
-            {
-                VASM_START,
-
-                VASM_DB, 0xFF,
-                VASM_DB, 0x05,
-
-                VASM_LDA, 0x11,
-                VASM_LDB, 0x88,
-                VASM_STA, 0x01, 0x00,
-                VASM_STB, 0x01, 0x01,
-
-                VASM_END
-            }
-        );
-        */
-        _cpu.ReadProgramFromFileToMemory(std::string(imxGUIData.programNameBuffer));
-
+        _cpu.ReadProgramFromFileToMemory(std::string(imxGUIData.programNameTXTBF));
         _cpu.Run();
     }
     imxGUIData.bClearMemoryButtonPressed = ImGui::Button("Clear memory");
     if (imxGUIData.bClearMemoryButtonPressed)
     {
         _cpu.Reset();
+    }
+    imxGUIData.bSaveProgramPressed = ImGui::Button("Save Program");
+    if (imxGUIData.bSaveProgramPressed)
+    {
+        _cpu.SaveCurrentProgramToFile(std::string(imxGUIData.programNameTXTBF));
     }
 
     ImGui::End();

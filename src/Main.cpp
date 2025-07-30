@@ -44,7 +44,7 @@ int main()
     if (glewInit() != GLEW_OK)
         std::cerr << "Could not initialize GLEW\n";
 
-    IMXGUIManager::Init(window);
+    IMGUIManager::Init(window);
 
     IMVCPU vCPU;
     vCPU.Init();
@@ -55,16 +55,16 @@ int main()
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        IMXGUIManager::LoadFrame();
-        IMXGUIManager::DisplayCodeEditor();
-        IMXGUIManager::DisplayMemoryViewer(vCPU);
-        IMXGUIManager::RenderFrame();
+        IMGUIManager::LoadFrame();
+        IMGUIManager::DisplayCodeEditor();
+        IMGUIManager::DisplayMemoryViewer(vCPU);
+        IMGUIManager::RenderFrame();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    IMXGUIManager::Close();
+    IMGUIManager::Close();
 
     glfwDestroyWindow(window);
     glfwTerminate();

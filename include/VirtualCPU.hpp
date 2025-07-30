@@ -14,16 +14,16 @@
 
 #define IMVCPU_MEMORY_MAX 0x400
 
-struct IMVCPUMemorySegment
+struct IMXCPUMemorySegment
 {
     uint16_t start;
     uint16_t end;
 };
 
-struct IMVCPUProgramLayout
+struct IMXCPUProgramLayout
 {
-    IMVCPUMemorySegment dataSegment;
-    IMVCPUMemorySegment codeSegment;
+    IMXCPUMemorySegment dataSegment;
+    IMXCPUMemorySegment codeSegment;
 };
 
 class IMVCPU
@@ -47,7 +47,7 @@ private:
     std::array<uint8_t, IMVCPU_MEMORY_MAX> m_Memory; 
     std::vector<uint8_t> m_CommandStack;
 
-    IMVCPUProgramLayout m_ProgramLayout;
+    IMXCPUProgramLayout m_ProgramLayout;
 
     uint8_t m_RegisterA;
     uint8_t m_RegisterB;
