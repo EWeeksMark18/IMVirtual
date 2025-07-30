@@ -3,10 +3,12 @@
 #include <vector>
 #include <cstdint>
 #include <cstring>
+#include <string>
+
 
 #include "Commands.hpp"
 
-#define IMVCPU_MEMORY_MAX 1024
+#define IMVCPU_MEMORY_MAX 0x400
 
 struct IMVCPUMemorySegment
 {
@@ -20,13 +22,6 @@ struct IMVCPUProgramLayout
     IMVCPUMemorySegment codeSegment;
 };
 
-struct IMVCPUProcessLayout
-{
-    IMVCPUProgramLayout programLayout;
-    IMVCPUMemorySegment heapSegment;
-    IMVCPUMemorySegment stackSegment;
-};
-
 class IMVCPU
 {
 public:
@@ -36,6 +31,9 @@ public:
     void Run();
     void LoadCommands(std::vector<uint8_t> commands);
 
+    void SaveCurrentProgramToFile(const std::string& filePath);
+    void ReadProgramFromFileToMemory(const std::string& filePath);
+
     std::array<uint8_t, IMVCPU_MEMORY_MAX> GetMemory();
     uint8_t GetRegisterA();
     uint8_t GetRegisterB();
@@ -43,7 +41,7 @@ private:
     std::array<uint8_t, IMVCPU_MEMORY_MAX> m_Memory; 
     std::vector<uint8_t> m_CommandStack;
 
-    IMVCPUProcessLayout m_ProcessLayout;
+    IMVCPUProgramLayout m_ProgramLayout;
 
     uint8_t m_RegisterA;
     uint8_t m_RegisterB;

@@ -16,6 +16,8 @@ struct IMXGUIData
     std::vector<std::string> codeLines;
     std::string memoryText;
 
+    char programNameBuffer[128];
+
     bool bAddLineButtonPressed;
     bool bRunCPUButtonPressed;
     bool bClearMemoryButtonPressed;

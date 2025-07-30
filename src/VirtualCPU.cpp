@@ -1,21 +1,16 @@
 #include <include/VirtualCPU.hpp>
 #include <iostream>
+#include <fstream>
 
 void IMVCPU::Init()
 {
     Reset();
 
     // Save on disk
-    m_ProcessLayout.programLayout.dataSegment.start =       0x0000;
-    m_ProcessLayout.programLayout.dataSegment.end =         0x0040;
-    m_ProcessLayout.programLayout.codeSegment.start =       0x0040;
-    m_ProcessLayout.programLayout.codeSegment.end =         0x0080;
-
-    // Do not save on disk
-    m_ProcessLayout.heapSegment.start =                     0x0080;
-    m_ProcessLayout.heapSegment.end =                       0x0160;
-    m_ProcessLayout.stackSegment.start =                    0x0160;
-    m_ProcessLayout.stackSegment.end =                      0x0200;
+    m_ProgramLayout.dataSegment.start =       0x0000;
+    m_ProgramLayout.dataSegment.end =         0x0040;
+    m_ProgramLayout.codeSegment.start =       0x0040;
+    m_ProgramLayout.codeSegment.end =         0x0080;
 }
 
 void IMVCPU::Reset()
@@ -37,6 +32,37 @@ void IMVCPU::LoadCommands(std::vector<uint8_t> commands)
 {
     for (auto& command : commands)
         m_CommandStack.emplace_back(command);
+}
+
+void IMVCPU::SaveCurrentProgramToFile(const std::string& filePath)
+{
+    std::ofstream saveFile(filePath, std::ios::binary | std::ios::out);
+    if (saveFile.is_open())
+    {
+        saveFile.write(reinterpret_cast<const char*>(m_Memory.data()), sizeof(uint8_t) * m_Memory.size());
+        std::cout << "Successfully saved " << filePath << " to disk!\n";
+    }
+    else 
+    {
+        std::cerr << "Could not save " << filePath << " to disk\n";
+    }
+}
+
+void IMVCPU::ReadProgramFromFileToMemory(const std::string& filePath)
+{
+    std::array<uint8_t, IMVCPU_MEMORY_MAX> memBuffer;
+
+    std::ifstream programFile(filePath, std::ios::binary | std::ios::in);
+    if (programFile.is_open())
+    {
+        programFile.read(reinterpret_cast<char*>(memBuffer.data()), sizeof(uint8_t) * memBuffer.size());
+        std::cout << "Successfully read " << filePath << " from disk!\n";
+        m_Memory = memBuffer;
+    }
+    else 
+    {
+        std::cerr << "Could not read file " << filePath << " from disk.\n";
+    }
 }
 
 std::array<uint8_t, IMVCPU_MEMORY_MAX> IMVCPU::GetMemory()
@@ -67,7 +93,7 @@ void IMVCPU::WriteRegisterB(uint8_t value)
 
 void IMVCPU::WriteData(uint16_t address, uint8_t value)
 {
-    if (address >= m_ProcessLayout.programLayout.dataSegment.start && address <= m_ProcessLayout.programLayout.dataSegment.end)
+    if (address >= m_ProgramLayout.dataSegment.start && address <= m_ProgramLayout.dataSegment.end)
     {
         WriteMemory(address, value);
     }
@@ -89,10 +115,10 @@ uint8_t IMVCPU::ReadMemory(uint16_t address)
 
 void IMVCPU::LoadCommandStackIntoMemory()
 {
-    uint16_t memoryIndex = m_ProcessLayout.programLayout.codeSegment.start;
+    uint16_t memoryIndex = m_ProgramLayout.codeSegment.start;
     for (auto& command : m_CommandStack)
     {
-        if (memoryIndex < m_ProcessLayout.programLayout.codeSegment.end)
+        if (memoryIndex < m_ProgramLayout.codeSegment.end)
         {
             m_Memory[memoryIndex] = command;
             memoryIndex++;
@@ -104,12 +130,12 @@ void IMVCPU::ExecuteCode()
 {
     // It's bit strange that I'm writing the data at run time rather than on disk. 
     // Though I need to read more about the data segment anyway.
-    uint16_t dataWriteIndex = m_ProcessLayout.programLayout.dataSegment.start;
+    uint16_t dataWriteIndex = m_ProgramLayout.dataSegment.start;
 
     // Start the program at 0x0000 in virtual memory
-    m_ProgramCounter = m_ProcessLayout.programLayout.codeSegment.start;
+    m_ProgramCounter = m_ProgramLayout.codeSegment.start;
 
-    while (m_ProgramCounter <= m_ProcessLayout.programLayout.codeSegment.end)
+    while (m_ProgramCounter <= m_ProgramLayout.codeSegment.end)
     {
         /* [COMMANDBYTE] [VALUEBYTE0] [VALUEBYTE1] */
         uint8_t commandByte =   ReadMemory(m_ProgramCounter);

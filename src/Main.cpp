@@ -49,6 +49,8 @@ int main()
     IMVCPU vCPU;
     vCPU.Init();
 
+    vCPU.ReadProgramFromFileToMemory("basic.imx");
+
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT);
@@ -63,6 +65,7 @@ int main()
     }
 
     IMXGUIManager::Close();
+
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

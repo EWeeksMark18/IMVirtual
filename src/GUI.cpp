@@ -76,10 +76,14 @@ void IMXGUIManager::DisplayMemoryViewer(IMVCPU& _cpu)
     ImGui::Text("A: %02X", _cpu.GetRegisterA());
     ImGui::Text("B: %02X", _cpu.GetRegisterB());
 
+    ImGui::InputText("Program name", imxGUIData.programNameBuffer, sizeof(imxGUIData.programNameBuffer));
+
     imxGUIData.bRunCPUButtonPressed = ImGui::Button("Run CPU");
     if (imxGUIData.bRunCPUButtonPressed)
     {
         // At some point, I want to read whatever program the user wants from disk.
+
+        /*
         _cpu.LoadCommands(
             {
                 VASM_START,
@@ -95,6 +99,9 @@ void IMXGUIManager::DisplayMemoryViewer(IMVCPU& _cpu)
                 VASM_END
             }
         );
+        */
+        _cpu.ReadProgramFromFileToMemory(std::string(imxGUIData.programNameBuffer));
+
         _cpu.Run();
     }
     imxGUIData.bClearMemoryButtonPressed = ImGui::Button("Clear memory");
